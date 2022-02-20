@@ -57,6 +57,9 @@ export const isFunction = (val: unknown): val is Function =>
   typeof val === 'function'
 export const isString = (val: unknown): val is string => typeof val === 'string'
 export const isSymbol = (val: unknown): val is symbol => typeof val === 'symbol'
+/** 
+ * 判断传入参数是不是对象，并且不是 null
+ */
 export const isObject = (val: unknown): val is Record<any, any> =>
   val !== null && typeof val === 'object'
 
@@ -132,7 +135,12 @@ export const toHandlerKey = cacheStringFunction((str: string) =>
   str ? `on${capitalize(str)}` : ``
 )
 
-// compare whether a value has changed, accounting for NaN.
+/**
+ * 比较两个值是否相同
+ * 
+ * compare whether a value has changed, accounting for NaN.
+ * @returns 相同则返回 false，不同返回 true
+ */
 export const hasChanged = (value: any, oldValue: any): boolean =>
   !Object.is(value, oldValue)
 

@@ -65,6 +65,7 @@ function getTargetType(value: Target) {
 export type UnwrapNestedRefs<T> = T extends Ref ? T : UnwrapRefSimple<T>
 
 /**
+ * 创建一个响应式的对象
  * Creates a reactive copy of the original object.
  *
  * The reactive conversion is "deep"—it affects all nested properties. In the
@@ -236,6 +237,9 @@ export function isProxy(value: unknown): boolean {
   return isReactive(value) || isReadonly(value)
 }
 
+/**
+ * 获取响应式对象的原始值
+ */
 export function toRaw<T>(observed: T): T {
   const raw = observed && (observed as Target)[ReactiveFlags.RAW]
   return raw ? toRaw(raw) : observed
@@ -246,6 +250,9 @@ export function markRaw<T extends object>(value: T): T {
   return value
 }
 
+/**
+ * 如果 value 是一个对象，则使用 reactive 创建一个响应式的对象，否则直接返回
+ */ 
 export const toReactive = <T extends unknown>(value: T): T =>
   isObject(value) ? reactive(value) : value
 

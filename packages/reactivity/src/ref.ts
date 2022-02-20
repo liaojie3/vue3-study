@@ -60,6 +60,9 @@ export function triggerRefValue(ref: RefBase<any>, newVal?: any) {
 }
 
 export function isRef<T>(r: Ref<T> | unknown): r is Ref<T>
+/** 
+ * 判断对象是否为 ref 包裹的对象，也就是 RefImpl 的实例
+ */
 export function isRef(r: any): r is Ref {
   return !!(r && r.__v_isRef === true)
 }
@@ -93,28 +96,43 @@ function createRef(rawValue: unknown, shallow: boolean) {
   return new RefImpl(rawValue, shallow)
 }
 
+/**
+ * ref 值包裹类
+ */
 class RefImpl<T> {
-  private _value: T
+  /** ref 包裹的值 */
+  private _value: T 
+  /** 原始值 */
   private _rawValue: T
 
   public dep?: Dep = undefined
+  /** 用来判断该对象是不是一个 ref 对象 */
   public readonly __v_isRef = true
 
   constructor(value: T, public readonly __v_isShallow: boolean) {
+    // 获取原始值
     this._rawValue = __v_isShallow ? value : toRaw(value)
+    // 通过 ref 调用的时候，如果 value 是对象，则使用 reactive 创建一个响应式对象
     this._value = __v_isShallow ? value : toReactive(value)
   }
 
   get value() {
+    // 收集依赖
     trackRefValue(this)
+
     return this._value
   }
 
   set value(newVal) {
+    // 获取原始值
     newVal = this.__v_isShallow ? newVal : toRaw(newVal)
+
     if (hasChanged(newVal, this._rawValue)) {
+      // 重新设置原始值和新值
       this._rawValue = newVal
       this._value = this.__v_isShallow ? newVal : toReactive(newVal)
+
+      // 触发依赖更新
       triggerRefValue(this, newVal)
     }
   }
